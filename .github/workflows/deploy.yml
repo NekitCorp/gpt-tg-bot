@@ -16,8 +16,8 @@ jobs:
             # Build
             - run: npm ci
             - run: npm run build
-            - run: cp package.json build/package.json
-            - run: cp package-lock.json build/package-lock.json
+            - run: cp package.json dist/package.json
+            - run: cp package-lock.json dist/package-lock.json
             # Deploy
             - uses: goodsmileduck/yandex-serverless-action@v2
               with:
