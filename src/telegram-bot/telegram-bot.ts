@@ -5,7 +5,6 @@ import { loggerMiddleware, onlySupportedChatsMiddleware } from "./middlewares";
 
 interface TelegramBotOptions {
     supportedChatIds: number[];
-    useLogger: boolean;
 }
 
 export class TelegramBot {
@@ -44,10 +43,7 @@ export class TelegramBot {
 
     private registerMiddlewares() {
         this.bot.use(onlySupportedChatsMiddleware(this.options.supportedChatIds));
-
-        if (this.options.useLogger) {
-            this.bot.use(loggerMiddleware(this.logger));
-        }
+        this.bot.use(loggerMiddleware(this.logger));
     }
 
     private registerMessageHandler() {

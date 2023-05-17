@@ -32,7 +32,6 @@ async function main() {
         process.env.TELEGRAM_BOT_TOKEN,
         {
             supportedChatIds: convertChatIdsString(process.env.TELEGRAM_BOT_SUPPORTED_CHAT_IDS),
-            useLogger: true,
         },
         logger,
         openAI

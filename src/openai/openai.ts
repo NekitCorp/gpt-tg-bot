@@ -26,7 +26,7 @@ export class OpenAI {
 
         messages.push({ role: "user", content: userMessage });
 
-        this.logger.info(messages);
+        this.logger.info("OpenAI create chat completion request messages", messages);
 
         const response = await this.openAIApi.createChatCompletion({
             model: "gpt-3.5-turbo",
@@ -35,7 +35,7 @@ export class OpenAI {
             messages,
         });
 
-        this.logger.info(response.data);
+        this.logger.info("OpenAI create chat completion response", response.data);
 
         const choices = response.data.choices;
         const content = choices[choices.length - 1].message?.content;
@@ -48,7 +48,7 @@ export class OpenAI {
     }
 
     public async createImage(prompt: string, size = CreateImageRequestSizeEnum._512x512): Promise<string> {
-        this.logger.info(prompt);
+        this.logger.info("OpenAI create image request prompt", prompt);
 
         const response = await this.openAIApi.createImage({
             prompt,
@@ -56,7 +56,7 @@ export class OpenAI {
             size,
         });
 
-        this.logger.info(response.data);
+        this.logger.info("OpenAI create image response", response.data);
 
         const url = response.data.data[0].url;
 
