@@ -1,4 +1,5 @@
 import { Bot } from "grammy";
+import { Update } from "grammy/types";
 import { Logger } from "tslog";
 import { OpenAI } from "../openai";
 import { loggerMiddleware, onlySupportedChatsMiddleware } from "./middlewares";
@@ -39,6 +40,10 @@ export class TelegramBot {
         return this.bot.stop().then(() => {
             this.logger.info("Bot stopped.");
         });
+    }
+
+    public update(update: Update) {
+        return this.bot.handleUpdate(update);
     }
 
     private registerMiddlewares() {
