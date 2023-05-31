@@ -25,8 +25,8 @@ jobs:
           function-name: "gpt-tg-bot"
           runtime: "nodejs16"
           memory: "256Mb"
-          execution-timeout: "80"
-          entrypoint: "index.handler"
+          execution-timeout: "60"
+          entrypoint: "dist/index.handler"
           environment: |
             TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}
             TELEGRAM_BOT_SUPPORTED_CHAT_IDS=${{ secrets.TELEGRAM_BOT_SUPPORTED_CHAT_IDS }}
@@ -37,4 +37,4 @@ jobs:
             package.json
             package-lock.json
           exclude: |
-            ./dist/dev.js
+            dist/dev.js
