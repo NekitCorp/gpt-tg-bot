@@ -1,5 +1,5 @@
 import { ChatCompletionRequestMessage, Configuration, CreateImageRequestSizeEnum, OpenAIApi } from "openai";
-import { Logger } from "tslog";
+import { Logger } from "../logger";
 
 interface OpenAIOptions {
     systemMessage: string;
@@ -8,7 +8,7 @@ interface OpenAIOptions {
 export class OpenAI {
     private readonly openAIApi: OpenAIApi;
 
-    constructor(apiKey: string, private options: OpenAIOptions, private logger: Logger<unknown>) {
+    constructor(apiKey: string, private options: OpenAIOptions, private logger: Logger) {
         const configuration = new Configuration({ apiKey });
 
         this.openAIApi = new OpenAIApi(configuration);

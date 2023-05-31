@@ -1,6 +1,6 @@
 import { Bot } from "grammy";
 import { Update } from "grammy/types";
-import { Logger } from "tslog";
+import { Logger } from "../logger";
 import { OpenAI } from "../openai";
 import { loggerMiddleware, onlySupportedChatsMiddleware } from "./middlewares";
 
@@ -11,12 +11,7 @@ interface TelegramBotOptions {
 export class TelegramBot {
     private readonly bot: Bot;
 
-    constructor(
-        token: string,
-        private options: TelegramBotOptions,
-        private logger: Logger<unknown>,
-        private openAI: OpenAI
-    ) {
+    constructor(token: string, private options: TelegramBotOptions, private logger: Logger, private openAI: OpenAI) {
         this.bot = new Bot(token);
         this.registerMiddlewares();
         this.registerPicCommand();
