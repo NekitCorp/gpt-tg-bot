@@ -1,31 +1,40 @@
 name: Deploy
 
 on:
-    push:
-        branches:
-            - main
+  push:
+    branches:
+      - main
 
 jobs:
-    deploy:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v2
-            - uses: actions/setup-node@v2
-              with:
-                  node-version: 16.x
-            # Build
-            - run: npm ci
-            - run: npm run build
-            - run: cp package.json dist/package.json
-            - run: cp package-lock.json dist/package-lock.json
-            # Deploy
-            - uses: goodsmileduck/yandex-serverless-action@v2
-              with:
-                  token: ${{ secrets.YC_OAUTH_TOKEN }}
-                  function_id: ${{ secrets.YC_CLOUD_FUNCTION_ID }}
-                  runtime: "nodejs16"
-                  entrypoint: "index.handler"
-                  environment: TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }},TELEGRAM_BOT_SUPPORTED_CHAT_IDS=${{ secrets.TELEGRAM_BOT_SUPPORTED_CHAT_IDS }},OPEN_AI_API_KEY=${{ secrets.OPEN_AI_API_KEY }},OPEN_AI_SYSTEM_MESSAGE=${{ secrets.OPEN_AI_SYSTEM_MESSAGE }}
-                  memory: "128"
-                  source: "./dist"
-                  execution_timeout: "60"
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      # Build
+      - run: npm ci
+      - run: npm run build
+      # Deploy
+      - uses: yc-actions/yc-sls-function@v2
+        with:
+          yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+          bucket: "gpt-tg-bot-deploy-bucket"
+          folder-id: "b1g3gioifpa83u7ajerc"
+          function-name: "gpt-tg-bot"
+          runtime: "nodejs16"
+          memory: "256Mb"
+          execution-timeout: "80"
+          entrypoint: "index.handler"
+          environment: |
+            TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}
+            TELEGRAM_BOT_SUPPORTED_CHAT_IDS=${{ secrets.TELEGRAM_BOT_SUPPORTED_CHAT_IDS }}
+            OPEN_AI_API_KEY=${{ secrets.OPEN_AI_API_KEY }}
+            OPEN_AI_SYSTEM_MESSAGE=${{ secrets.OPEN_AI_SYSTEM_MESSAGE }}
+          include: |
+            ./dist
+            package.json
+            package-lock.json
+          exclude: |
+            ./dist/dev.js

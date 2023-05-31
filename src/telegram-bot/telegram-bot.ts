@@ -42,7 +42,8 @@ export class TelegramBot {
         });
     }
 
-    public update(update: Update) {
+    public async update(update: Update) {
+        await this.bot.init();
         return this.bot.handleUpdate(update);
     }
 
@@ -76,7 +77,7 @@ export class TelegramBot {
 
                 const response = await this.openAI.createChatCompletion(text, prevMessage);
 
-                return ctx.reply(response);
+                return ctx.reply(response, { reply_to_message_id: isGroup ? message.message_id : undefined });
             }
         });
     }
