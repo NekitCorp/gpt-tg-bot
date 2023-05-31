@@ -1,4 +1,8 @@
-# gpt-tg-bot
+# OpenAI Chat Completion Telegram Bot
+
+-   [Chat completions](https://platform.openai.com/docs/guides/chat)
+-   [Image generation](https://platform.openai.com/docs/guides/images)
+-   [Telegram Bot](https://core.telegram.org/bots)
 
 ## Development
 
@@ -7,8 +11,8 @@
 copy .env.example .env
 
 # Install dependencies
-yarn
+npm i
 
 # Start telegram bot
-yarn dev
+npm run dev
 ```

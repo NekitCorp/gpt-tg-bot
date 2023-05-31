@@ -82,15 +82,13 @@ export class TelegramBot {
             const prompt = ctx.message?.text?.replace("/pic", "").trim();
 
             if (prompt) {
-                return ctx.reply(`💩 The feature is temporarily unavailable.\n\n🏞️ Picture should be here: ${prompt}`);
+                await ctx.replyWithChatAction("upload_photo");
 
-                // await ctx.replyWithChatAction("typing");
+                const url = await this.openAI.createImage(prompt);
 
-                // const url = await this.openAI.createImage(prompt);
-
-                // ctx.replyWithPhoto(url, {
-                //     reply_to_message_id: ctx.message?.message_id,
-                // });
+                ctx.replyWithPhoto(url, {
+                    reply_to_message_id: ctx.message?.message_id,
+                });
             }
         });
     }
