@@ -73,7 +73,7 @@ export class TelegramBot {
 
     private registerVoiceMessageHandler() {
         this.bot.on("message:voice", async (ctx) => {
-            const { needReaction, isGroup } = this.parseMessage(ctx.message, ctx.chat, ctx.me);
+            const { needReaction, isGroup, prevMessage } = this.parseMessage(ctx.message, ctx.chat, ctx.me);
 
             if (!needReaction) {
                 return;
@@ -99,7 +99,7 @@ export class TelegramBot {
 
             ctx.replyWithChatAction("typing");
 
-            const response = await this.openAI.createChatCompletion(text);
+            const response = await this.openAI.createChatCompletion(text, prevMessage);
 
             return ctx.reply(response, { reply_to_message_id: isGroup ? ctx.message.message_id : undefined });
         });
