@@ -10,9 +10,7 @@
         "check": "tsc --noEmit"
     },
     "dependencies": {
-        "@ffmpeg-installer/ffmpeg": "1.1.0",
-        "@grammyjs/files": "1.0.4",
-        "fluent-ffmpeg": "2.1.2",
+        "axios": "1.4.0",
         "grammy": "1.17.2",
         "openai": "3.3.0",
         "tslog": "4.8.2"

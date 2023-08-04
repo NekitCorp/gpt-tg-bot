@@ -1,12 +1,12 @@
-import { getEnv } from "./src/helpers";
+import { convertChatIdsString, getEnv } from "./src/helpers";
 import { Logger } from "./src/logger";
 import { OpenAI } from "./src/openai";
-import { TelegramBot, convertChatIdsString } from "./src/telegram-bot";
+import { TelegramBot } from "./src/telegram-bot";
 
 const TELEGRAM_BOT_TOKEN = getEnv("TELEGRAM_BOT_TOKEN");
 const TELEGRAM_BOT_SUPPORTED_CHAT_IDS = getEnv("TELEGRAM_BOT_SUPPORTED_CHAT_IDS");
 const OPEN_AI_API_KEY = getEnv("OPEN_AI_API_KEY");
-const OPEN_AI_SYSTEM_MESSAGE = getEnv("OPEN_AI_SYSTEM_MESSAGE");
+const OPEN_AI_SYSTEM_MESSAGE = getEnv("OPEN_AI_SYSTEM_MESSAGE", "");
 
 const logger = new Logger(true);
 const openAI = new OpenAI(OPEN_AI_API_KEY, { systemMessage: OPEN_AI_SYSTEM_MESSAGE }, logger);

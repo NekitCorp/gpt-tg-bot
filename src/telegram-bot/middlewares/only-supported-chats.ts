@@ -18,7 +18,3 @@ export function onlySupportedChatsMiddleware<T extends Context>(chatIds: number[
         }
     };
 }
-
-export function convertChatIdsString(value: string): number[] {
-    return value.split(",").map((i) => Number(i));
-}
