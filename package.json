@@ -1,20 +1,26 @@
 {
     "name": "gpt-tg-bot",
     "version": "1.0.0",
+    "engines": {
+        "node": "16.14.1"
+    },
     "scripts": {
         "dev": "tsx dev.ts",
         "build": "tsc",
         "check": "tsc --noEmit"
     },
     "dependencies": {
-        "grammy": "^1.16.0",
-        "openai": "^3.2.1",
-        "tslog": "^4.8.2"
+        "@ffmpeg-installer/ffmpeg": "1.1.0",
+        "@grammyjs/files": "1.0.4",
+        "fluent-ffmpeg": "2.1.2",
+        "grammy": "1.17.2",
+        "openai": "3.3.0",
+        "tslog": "4.8.2"
     },
     "devDependencies": {
-        "@types/node": "^20.1.5",
-        "dotenv": "^16.0.3",
-        "tsx": "^3.12.7",
-        "typescript": "^5.0.4"
+        "@types/node": "^16.14.1",
+        "dotenv": "16.3.1",
+        "tsx": "3.12.7",
+        "typescript": "5.1.6"
     }
 }
