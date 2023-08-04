@@ -1,5 +1,8 @@
+import axios from "axios";
+import { spawn } from "child_process";
 import { Bot } from "grammy";
-import { Update } from "grammy/types";
+import { Chat, Message, Update, UserFromGetMe } from "grammy/types";
+import { Readable } from "stream";
 import { Logger } from "../logger";
 import { OpenAI } from "../openai";
 import { loggerMiddleware, onlySupportedChatsMiddleware } from "./middlewares";
@@ -11,11 +14,18 @@ interface TelegramBotOptions {
 export class TelegramBot {
     private readonly bot: Bot;
 
-    constructor(token: string, private options: TelegramBotOptions, private logger: Logger, private openAI: OpenAI) {
+    constructor(
+        private token: string,
+        private options: TelegramBotOptions,
+        private logger: Logger,
+        private openAI: OpenAI
+    ) {
         this.bot = new Bot(token);
+
         this.registerMiddlewares();
         this.registerPicCommand();
         this.registerMessageHandler();
+        this.registerVoiceMessageHandler();
     }
 
     public start() {
@@ -49,31 +59,49 @@ export class TelegramBot {
 
     private registerMessageHandler() {
         this.bot.on("message:text", async (ctx) => {
-            const { message, chat } = ctx;
+            const { needReaction, prevMessage, text, isGroup } = this.parseMessage(ctx.message, ctx.chat, ctx.me);
 
-            const isGroup = chat.type !== "private";
-            const isPrivate = chat.type === "private";
-            const isReply = Boolean(message.reply_to_message?.text);
-            const isReplyBotMessage = message.reply_to_message?.from?.id === ctx.me.id;
-            const isMentionBot = ctx.message.entities?.some(
-                (entity) =>
-                    entity.type === "mention" &&
-                    ctx.message.text.slice(entity.offset, entity.offset + entity.length) === `@${ctx.me.username}`
-            );
-            const text = isMentionBot ? message.text.replace(`@${ctx.me.username}`, "").trim() : message.text;
-            const prevMessage = isReply
-                ? isReplyBotMessage
-                    ? { role: "assistant" as const, content: message.reply_to_message!.text! }
-                    : { role: "user" as const, content: message.reply_to_message!.text! }
-                : undefined;
-
-            if (isPrivate || (isGroup && isMentionBot) || (isGroup && isReplyBotMessage)) {
+            if (needReaction && text) {
                 ctx.replyWithChatAction("typing");
 
                 const response = await this.openAI.createChatCompletion(text, prevMessage);
 
-                return ctx.reply(response, { reply_to_message_id: isGroup ? message.message_id : undefined });
+                return ctx.reply(response, { reply_to_message_id: isGroup ? ctx.message.message_id : undefined });
             }
+        });
+    }
+
+    private registerVoiceMessageHandler() {
+        this.bot.on("message:voice", async (ctx) => {
+            const { needReaction, isGroup } = this.parseMessage(ctx.message, ctx.chat, ctx.me);
+
+            if (!needReaction) {
+                return;
+            }
+
+            if (ctx.msg.voice.duration > 30) {
+                return ctx.reply(`🚫 Voice message duration limit exceeded. The maximum duration is 30 seconds.`);
+            }
+
+            const file = await ctx.getFile();
+            const { data: voiceOgg } = await axios.get<Readable>(
+                `https://api.telegram.org/file/bot${this.token}/${file.file_path}`,
+                { responseType: "stream" }
+            );
+
+            // Converting .ogg to .mp3
+            const ffmpegProcess = spawn("ffmpeg", ["-f", "ogg", "-i", "-", "-f", "mp3", "-"]);
+            voiceOgg.pipe(ffmpegProcess.stdin);
+
+            const text = await this.openAI.createTranscription(ffmpegProcess.stdout);
+
+            await ctx.reply("Request: " + text + "\n\n⌛ Processing a request...");
+
+            ctx.replyWithChatAction("typing");
+
+            const response = await this.openAI.createChatCompletion(text);
+
+            return ctx.reply(response, { reply_to_message_id: isGroup ? ctx.message.message_id : undefined });
         });
     }
 
@@ -91,5 +119,31 @@ export class TelegramBot {
                 });
             }
         });
+    }
+
+    private parseMessage(message: Message, chat: Chat, me: UserFromGetMe) {
+        const isGroup = chat.type !== "private";
+        const isPrivate = chat.type === "private";
+        const isReply = Boolean(message.reply_to_message?.text);
+        const isReplyBotMessage = message.reply_to_message?.from?.id === me.id;
+        const isMentionBot = message.entities?.some(
+            (entity) =>
+                entity.type === "mention" &&
+                message.text?.slice(entity.offset, entity.offset + entity.length) === `@${me.username}`
+        );
+
+        const text = isMentionBot ? message.text?.replace(`@${me.username}`, "").trim() : message.text;
+        const prevMessage = isReply
+            ? isReplyBotMessage
+                ? { role: "assistant" as const, content: message.reply_to_message!.text! }
+                : { role: "user" as const, content: message.reply_to_message!.text! }
+            : undefined;
+
+        return {
+            isGroup,
+            needReaction: isPrivate || (isGroup && isMentionBot) || (isGroup && isReplyBotMessage),
+            prevMessage,
+            text,
+        };
     }
 }
