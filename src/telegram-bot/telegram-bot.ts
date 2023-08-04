@@ -53,7 +53,7 @@ export class TelegramBot {
     }
 
     private registerMiddlewares() {
-        this.bot.use(onlySupportedChatsMiddleware(this.options.supportedChatIds));
+        this.bot.use(onlySupportedChatsMiddleware(this.options.supportedChatIds, this.logger));
         this.bot.use(loggerMiddleware(this.logger));
     }
 
