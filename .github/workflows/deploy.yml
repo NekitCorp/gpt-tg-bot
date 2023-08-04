@@ -31,8 +31,8 @@ jobs:
           environment: |
             TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}
             TELEGRAM_BOT_SUPPORTED_CHAT_IDS=${{ secrets.TELEGRAM_BOT_SUPPORTED_CHAT_IDS }}
+            ${{ secrets.OPEN_AI_SYSTEM_MESSAGE && 'OPEN_AI_SYSTEM_MESSAGE=' || '' }}${{ secrets.OPEN_AI_SYSTEM_MESSAGE && secrets.OPEN_AI_SYSTEM_MESSAGE || '' }}
             OPEN_AI_API_KEY=${{ secrets.OPEN_AI_API_KEY }}
-            OPEN_AI_SYSTEM_MESSAGE=${{ secrets.OPEN_AI_SYSTEM_MESSAGE }}
           include: |
             ./dist
             package.json
