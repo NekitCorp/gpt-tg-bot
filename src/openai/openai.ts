@@ -8,7 +8,6 @@ import {
     OpenAIApi,
 } from "openai";
 import { Readable } from "stream";
-import { ILogger } from "../logger";
 
 interface OpenAIOptions {
     systemMessage: string;

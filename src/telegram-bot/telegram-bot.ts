@@ -3,7 +3,6 @@ import { spawn } from "child_process";
 import { Bot } from "grammy";
 import { Chat, Message, Update, UserFromGetMe } from "grammy/types";
 import { Readable } from "stream";
-import { ILogger } from "../logger";
 import { OpenAI } from "../openai";
 import { loggerMiddleware, onlySupportedChatsMiddleware } from "./middlewares";
 

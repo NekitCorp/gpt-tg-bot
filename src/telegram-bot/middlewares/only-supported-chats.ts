@@ -1,5 +1,4 @@
 import { Context, NextFunction } from "grammy";
-import { ILogger } from "../../logger";
 
 const STICKER_FILE_ID_ACCESS_DENIED = "CAACAgIAAxkBAANSZGOgyP8Q5ELcCqBp4SHddNmp7kwAAkUTAAJpr8lLqaVJkKIF8sMvBA";
 

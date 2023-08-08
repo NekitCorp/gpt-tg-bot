@@ -53,3 +53,9 @@ type ICloudResponse = {
     body: string;
     isBase64Encoded?: boolean;
 };
+
+type ILogger = {
+    info(message: string, data?: unknown): void;
+    warn(message: string, data?: unknown): void;
+    error(message: string, data?: unknown): void;
+};

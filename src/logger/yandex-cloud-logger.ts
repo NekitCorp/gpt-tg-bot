@@ -1,5 +1,3 @@
-import { ILogger } from "./types";
-
 const enum YandexCloudLoggingLevel {
     TRACE = "TRACE",
     DEBUG = "DEBUG",
