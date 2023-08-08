@@ -1,8 +1,10 @@
-# OpenAI Chat Completion Telegram Bot
+# OpenAI Telegram Bot
 
--   [Chat completions](https://platform.openai.com/docs/guides/chat)
--   [Image generation](https://platform.openai.com/docs/guides/images)
--   [Telegram Bot](https://core.telegram.org/bots)
+## Features
+
+-   Chat with a bot using [Chat Completions](https://platform.openai.com/docs/guides/gpt/chat-completions-api) and `gpt-3.5-turbo` model.
+-   Image generation with [Image generation](https://platform.openai.com/docs/guides/images) and `DALL·E` model using the command `/pic {prompt}`.
+-   Processing voice messages using [Speech to text](https://platform.openai.com/docs/guides/speech-to-text) and `whisper-1` model.
 
 ## Development
 
@@ -15,4 +17,7 @@ npm i
 
 # Start telegram bot
 npm run dev
+
+# Run type-checker
+npm run check
 ```
