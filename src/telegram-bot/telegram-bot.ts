@@ -3,7 +3,7 @@ import { spawn } from "child_process";
 import { Bot } from "grammy";
 import { Chat, Message, Update, UserFromGetMe } from "grammy/types";
 import { Readable } from "stream";
-import { Logger } from "../logger";
+import { ILogger } from "../logger";
 import { OpenAI } from "../openai";
 import { loggerMiddleware, onlySupportedChatsMiddleware } from "./middlewares";
 
@@ -17,7 +17,7 @@ export class TelegramBot {
     constructor(
         private token: string,
         private options: TelegramBotOptions,
-        private logger: Logger,
+        private logger: ILogger,
         private openAI: OpenAI
     ) {
         this.bot = new Bot(token);
@@ -33,7 +33,7 @@ export class TelegramBot {
 
         this.bot.start({
             onStart: (botInfo) => {
-                this.logger.info(`Bot @${botInfo.username} [${botInfo.id}] is running.`);
+                this.logger.info(`Bot https://t.me/${botInfo.username} [${botInfo.id}] is running.`);
                 this.logger.info(`Supported chat ids: ${this.options.supportedChatIds.join(", ")}.`);
             },
         });

@@ -1,7 +1,14 @@
 import { ReadStream } from "fs";
-import { ChatCompletionRequestMessage, Configuration, CreateImageRequestSizeEnum, OpenAIApi } from "openai";
+import {
+    ChatCompletionRequestMessage,
+    Configuration,
+    CreateChatCompletionRequest,
+    CreateImageRequest,
+    CreateImageRequestSizeEnum,
+    OpenAIApi,
+} from "openai";
 import { Readable } from "stream";
-import { Logger } from "../logger";
+import { ILogger } from "../logger";
 
 interface OpenAIOptions {
     systemMessage: string;
@@ -10,7 +17,7 @@ interface OpenAIOptions {
 export class OpenAI {
     private readonly openAIApi: OpenAIApi;
 
-    constructor(apiKey: string, private options: OpenAIOptions, private logger: Logger) {
+    constructor(apiKey: string, private options: OpenAIOptions, private logger: ILogger) {
         const configuration = new Configuration({ apiKey });
 
         this.openAIApi = new OpenAIApi(configuration);
@@ -38,15 +45,17 @@ export class OpenAI {
 
         messages.push({ role: "user", content: userMessage });
 
-        this.logger.info("OpenAI.createChatCompletion request messages", messages);
-
-        const response = await this.openAIApi.createChatCompletion({
+        const request: CreateChatCompletionRequest = {
+            // Unfortunately, there is no access to GPT-4, so use GPT-3.5 for now:
+            // https://help.openai.com/en/articles/7102672-how-can-i-access-gpt-4
             model: "gpt-3.5-turbo",
-            temperature: 0.9,
+            temperature: 1,
             max_tokens: 512,
             messages,
-        });
+        };
 
+        this.logger.info("OpenAI.createChatCompletion request", request);
+        const response = await this.openAIApi.createChatCompletion(request);
         this.logger.info("OpenAI.createChatCompletion response", response.data);
 
         const choices = response.data.choices;
@@ -66,14 +75,14 @@ export class OpenAI {
      * @price https://openai.com/pricing
      */
     public async createImage(prompt: string, size = CreateImageRequestSizeEnum._512x512): Promise<string> {
-        this.logger.info("OpenAI.createImage request prompt", prompt);
-
-        const response = await this.openAIApi.createImage({
+        const request: CreateImageRequest = {
             prompt,
             n: 1,
             size,
-        });
+        };
 
+        this.logger.info("OpenAI.createImage request", request);
+        const response = await this.openAIApi.createImage(request);
         this.logger.info("OpenAI.createImage response", response.data);
 
         const url = response.data.data[0].url;
@@ -92,18 +101,16 @@ export class OpenAI {
      * @price https://openai.com/pricing
      */
     public async createTranscription(stream: Readable): Promise<string> {
-        this.logger.info("OpenAI.createTranscription request");
-
         // HACK: Necessary to quack like a file upload.
         // https://github.com/openai/openai-node/issues/77#issuecomment-1483937913
         (stream as ReadStream).path = "upload.mp3";
 
+        this.logger.info("OpenAI.createTranscription request");
         const response = await this.openAIApi.createTranscription(
             // HACK: https://github.com/openai/openai-node/issues/77#issuecomment-1452801077
             stream as unknown as File,
             "whisper-1"
         );
-
         this.logger.info("OpenAI.createTranscription response", response.data);
 
         return response.data.text;

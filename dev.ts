@@ -1,6 +1,6 @@
 import { config } from "dotenv";
+import { Logger } from "tslog";
 import { convertChatIdsString, getEnv } from "./src/helpers";
-import { Logger } from "./src/logger";
 import { OpenAI } from "./src/openai";
 import { TelegramBot } from "./src/telegram-bot";
 
@@ -12,7 +12,7 @@ const OPEN_AI_API_KEY = getEnv("OPEN_AI_API_KEY");
 const OPEN_AI_SYSTEM_MESSAGE = getEnv("OPEN_AI_SYSTEM_MESSAGE", "");
 
 async function main() {
-    const logger = new Logger(false);
+    const logger = new Logger();
     const openAI = new OpenAI(OPEN_AI_API_KEY, { systemMessage: OPEN_AI_SYSTEM_MESSAGE }, logger);
     const telegramBot = new TelegramBot(
         TELEGRAM_BOT_TOKEN,
